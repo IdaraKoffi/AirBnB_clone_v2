@@ -97,3 +97,34 @@ class test_basemodel(unittest.TestCase):
         n = new.to_dict()
         new = BaseModel(**n)
         self.assertFalse(new.created_at == new.updated_at)
+
+    class TestConsoleCreate(unittest.TestCase):
+    def setUp(self):
+        self.console = HBNBCommand()
+        self.obj_id = None
+        self.saved_stdout = sys.stdout
+        sys.stdout = StringIO()
+
+    def tearDown(self):
+        sys.stdout = self.saved_stdout
+        if self.obj_id:
+            HBNBCommand._all = {}
+
+    def test_create_base_model(self):
+        # Test creating a BaseModel instance with parameters
+        self.console.onecmd('create BaseModel name="My House" number=42')
+        output = sys.stdout.getvalue().strip()
+        self.assertTrue(len(output) == 36)  # Check if a valid ID is returned
+        self.obj_id = output
+        obj = HBNBCommand._all["BaseModel.{}".format(output)]
+        self.assertEqual(obj.name, "My House")
+        self.assertEqual(obj.number, 42)
+
+    def test_create_invalid_class(self):
+        # Test creating an instance of an invalid class
+        self.console.onecmd('create InvalidClass')
+        output = sys.stdout.getvalue().strip()
+        self.assertEqual(output, "** class doesn't exist **")
+
+if __name__ == '__main__':
+    unittest.main()
