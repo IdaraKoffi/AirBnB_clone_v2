@@ -41,6 +41,7 @@ class TestBaseModel(unittest.TestCase):
         except Exception:
             pass
 
+<<<<<<< HEAD
     def test_pep8_BaseModel(self):
         """Testing for pep8"""
         style = pep8.StyleGuide(quiet=True)
@@ -98,4 +99,106 @@ class TestBaseModel(unittest.TestCase):
         self.assertFalse('_sa_instance_state' in base_dict.keys())
 
 if __name__ == "__main__":
+=======
+    def test_default(self):
+        """ """
+        i = self.value()
+        self.assertEqual(type(i), self.value)
+
+    def test_kwargs(self):
+        """ """
+        i = self.value()
+        copy = i.to_dict()
+        new = BaseModel(**copy)
+        self.assertFalse(new is i)
+
+    def test_kwargs_int(self):
+        """ """
+        i = self.value()
+        copy = i.to_dict()
+        copy.update({1: 2})
+        with self.assertRaises(TypeError):
+            new = BaseModel(**copy)
+
+    def test_save(self):
+        """ Testing save """
+        i = self.value()
+        i.save()
+        key = self.name + "." + i.id
+        with open('file.json', 'r') as f:
+            j = json.load(f)
+            self.assertEqual(j[key], i.to_dict())
+
+    def test_str(self):
+        """ """
+        i = self.value()
+        self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
+                         i.__dict__))
+
+    def test_todict(self):
+        """ """
+        i = self.value()
+        n = i.to_dict()
+        self.assertEqual(i.to_dict(), n)
+
+    def test_kwargs_none(self):
+        """ """
+        n = {None: None}
+        with self.assertRaises(TypeError):
+            new = self.value(**n)
+
+    def test_kwargs_one(self):
+        """ """
+        n = {'Name': 'test'}
+        with self.assertRaises(KeyError):
+            new = self.value(**n)
+
+    def test_id(self):
+        """ """
+        new = self.value()
+        self.assertEqual(type(new.id), str)
+
+    def test_created_at(self):
+        """ """
+        new = self.value()
+        self.assertEqual(type(new.created_at), datetime.datetime)
+
+    def test_updated_at(self):
+        """ """
+        new = self.value()
+        self.assertEqual(type(new.updated_at), datetime.datetime)
+        n = new.to_dict()
+        new = BaseModel(**n)
+        self.assertFalse(new.created_at == new.updated_at)
+
+    class TestConsoleCreate(unittest.TestCase):
+    def setUp(self):
+        self.console = HBNBCommand()
+        self.obj_id = None
+        self.saved_stdout = sys.stdout
+        sys.stdout = StringIO()
+
+    def tearDown(self):
+        sys.stdout = self.saved_stdout
+        if self.obj_id:
+            HBNBCommand._all = {}
+
+    def test_create_base_model(self):
+        # Test creating a BaseModel instance with parameters
+        self.console.onecmd('create BaseModel name="My House" number=42')
+        output = sys.stdout.getvalue().strip()
+        self.assertTrue(len(output) == 36)  # Check if a valid ID is returned
+        self.obj_id = output
+        obj = HBNBCommand._all["BaseModel.{}".format(output)]
+        self.assertEqual(obj.name, "My House")
+        self.assertEqual(obj.number, 42)
+
+    def test_create_invalid_class(self):
+        # Test creating an instance of an invalid class
+        self.console.onecmd('create InvalidClass')
+        output = sys.stdout.getvalue().strip()
+        self.assertEqual(output, "** class doesn't exist **")
+
+if __name__ == '__main__':
+>>>>>>> 5f50dd86a4f6927a24072fcef5e8b75746d96949
     unittest.main()
