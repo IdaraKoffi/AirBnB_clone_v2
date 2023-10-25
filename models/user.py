@@ -32,3 +32,10 @@ class User(BaseModel, Base):
         cascade="all, delete, delete-orphan",
         backref='user'
     ) if os.getenv('HBNB_TYPE_STORAGE') == 'db' else None
+
+    __tablename__ = 'users'
+    
+    email = Column(String(128), nullable=False)
+    password = Column(String(128), nullable=False)
+    first_name = Column(String(128), nullable=True)
+    last_name = Column(String(128), nullable=True

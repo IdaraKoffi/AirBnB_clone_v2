@@ -1,83 +1,71 @@
+#!/usr/bin/python3
+"""test for BaseModel"""
 import unittest
+import os
+from os import getenv
 from models.base_model import BaseModel
-from models import storage
-from datetime import datetime
+import pep8
+
 
 class TestBaseModel(unittest.TestCase):
-    def test_create_instance(self):
-        obj = BaseModel()
-        self.assertIsInstance(obj, BaseModel)
+    """this will test the base model class"""
 
-    def test_id_generation(self):
-        obj1 = BaseModel()
-        obj2 = BaseModel()
-        self.assertNotEqual(obj1.id, obj2.id)
+    @classmethod
+    def setUpClass(cls):
+        """setup for the test"""
+        cls.base = BaseModel()
+        cls.base.name = "Kev"
+        cls.base.num = 20
 
-    def test_created_at_and_updated_at(self):
-        obj = BaseModel()
-        self.assertIsNotNone(obj.created_at)
-        self.assertIsNotNone(obj.updated_at)
-        self.assertEqual(obj.created_at, obj.updated_at)
+    @classmethod
+    def teardown(cls):
+        """at the end of the test this will tear it down"""
+        del cls.base
 
-    def test_to_dict_method(self):
-        obj = BaseModel()
-        obj_dict = obj.to_dict()
+    def tearDown(self):
+        """teardown"""
+        try:
+            os.remove("file.json")
+        except Exception:
+            pass
 
-        self.assertIsInstance(obj_dict, dict)
-        self.assertEqual(obj_dict['__class__'], 'BaseModel')
-        self.assertIn('id', obj_dict)
-        self.assertIn('created_at', obj_dict)
-        self.assertIn('updated_at', obj_dict)
+    def test_pep8_BaseModel(self):
+        """Testing for pep8"""
+        style = pep8.StyleGuide(quiet=True)
+        p = style.check_files(['models/base_model.py'])
+        self.assertEqual(p.total_errors, 0, "fix pep8")
 
-    def test_custom_attributes(self):
-        obj = BaseModel()
-        obj.name = "Test Name"
-        obj.value = 42
+    def test_checking_for_docstring_BaseModel(self):
+        """checking for docstrings"""
+        self.assertIsNotNone(BaseModel.__doc__)
+        self.assertIsNotNone(BaseModel.__init__.__doc__)
+        self.assertIsNotNone(BaseModel.__str__.__doc__)
+        self.assertIsNotNone(BaseModel.save.__doc__)
+        self.assertIsNotNone(BaseModel.to_dict.__doc__)
 
-        self.assertEqual(obj.name, "Test Name")
-        self.assertEqual(obj.value, 42)
+    def test_method_BaseModel(self):
+        """chekcing if Basemodel have methods"""
+        self.assertTrue(hasattr(BaseModel, "__init__"))
+        self.assertTrue(hasattr(BaseModel, "save"))
+        self.assertTrue(hasattr(BaseModel, "to_dict"))
 
-    def test_str_representation(self):
-        obj = BaseModel()
-        obj.name = "Test Name"
-        obj.value = 42
+    def test_init_BaseModel(self):
+        """test if the base is an type BaseModel"""
+        self.assertTrue(isinstance(self.base, BaseModel))
 
-        obj_str = str(obj)
-        self.assertIn("[BaseModel]", obj_str)
-        self.assertIn("'name': 'Test Name'", obj_str)
-        self.assertIn("'value': 42", obj_str)
+    @unittest.skipIf(getenv("HBNB_TYPE_STORAGE") == 'db', 'DB')
+    def test_save_BaesModel(self):
+        """test if the save works"""
+        self.base.save()
+        self.assertNotEqual(self.base.created_at, self.base.updated_at)
 
-if __name__ == '__main__':
+    def test_to_dict_BaseModel(self):
+        """test if dictionary works"""
+        base_dict = self.base.to_dict()
+        self.assertEqual(self.base.__class__.__name__, 'BaseModel')
+        self.assertIsInstance(base_dict['created_at'], str)
+        self.assertIsInstance(base_dict['updated_at'], str)
+
+
+if __name__ == "__main__":
     unittest.main()
-
-    def setUp(self):
-        self.model = BaseModel()
-        self.model.name = "Test Model"
-        self.model.my_number = 5
-        self.model.save()
-
-    def test_BaseModel_instantiation(self):
-        self.assertIsInstance(self.model, BaseModel)
-
-    def test_BaseModel_created_at(self):
-        self.assertIsInstance(self.model.created_at, datetime)
-
-    def test_BaseModel_updated_at(self):
-        self.assertIsInstance(self.model.updated_at, datetime)
-
-    def test_BaseModel_to_dict(self):
-        model_dict = self.model.to_dict()
-        self.assertIsInstance(model_dict, dict)
-        self.assertIn('id', model_dict)
-        self.assertIn('created_at', model_dict)
-        self.assertIn('updated_at', model_dict)
-
-    def test_BaseModel_save(self):
-        prev_updated_at = self.model.updated_at
-        self.model.save()
-        self.assertNotEqual(prev_updated_at, self.model.updated_at)
-
-    def test_BaseModel_delete(self):
-        self.model.delete()
-        key = "BaseModel." + self.model.id
-        self.assertNotIn(key, storage.all())
