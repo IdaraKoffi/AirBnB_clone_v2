@@ -62,8 +62,36 @@ class FileStorage:
             with open(self.__file_path, 'r') as file:
                 temp = json.load(file)
                 for key, val in temp.items():
+<<<<<<< HEAD
                     self.all()[key] = classes[val['__class__']](**val)
 
     def close(self):
         """Closes the storage engine."""
         self.reload()
+=======
+                        self.all()[key] = classes[val['__class__']](**val)
+        except FileNotFoundError:
+            pass
+
+    def delete(self, obj=None):
+        """
+        Deletes an object from __objects if it exists.
+        """
+        if obj:
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]
+                self.save()
+
+    def all(self, cls=None):
+        """
+        Returns a dictionary of objects, optionally filtered by class.
+        """
+        if cls is not None:
+            obj_dict = {}
+            for key, value in self.__objects.items():
+                if key.startswith(cls.__name__):
+                    obj_dict[key] = value
+            return obj_dict
+        return self.__objects
+>>>>>>> 03c40cb3b66cda6de99a04d571c7b5f9be586499
