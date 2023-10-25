@@ -1,5 +1,7 @@
 import unittest
 from models.base_model import BaseModel
+from models import storage
+from datetime import datetime
 
 class TestBaseModel(unittest.TestCase):
     def test_create_instance(self):
@@ -47,3 +49,35 @@ class TestBaseModel(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+    def setUp(self):
+        self.model = BaseModel()
+        self.model.name = "Test Model"
+        self.model.my_number = 5
+        self.model.save()
+
+    def test_BaseModel_instantiation(self):
+        self.assertIsInstance(self.model, BaseModel)
+
+    def test_BaseModel_created_at(self):
+        self.assertIsInstance(self.model.created_at, datetime)
+
+    def test_BaseModel_updated_at(self):
+        self.assertIsInstance(self.model.updated_at, datetime)
+
+    def test_BaseModel_to_dict(self):
+        model_dict = self.model.to_dict()
+        self.assertIsInstance(model_dict, dict)
+        self.assertIn('id', model_dict)
+        self.assertIn('created_at', model_dict)
+        self.assertIn('updated_at', model_dict)
+
+    def test_BaseModel_save(self):
+        prev_updated_at = self.model.updated_at
+        self.model.save()
+        self.assertNotEqual(prev_updated_at, self.model.updated_at)
+
+    def test_BaseModel_delete(self):
+        self.model.delete()
+        key = "BaseModel." + self.model.id
+        self.assertNotIn(key, storage.all())
