@@ -64,7 +64,7 @@ class TestCity(unittest.TestCase):
         self.assertNotEqual(self.city.created_at, self.city.updated_at)
 
     def test_to_dict_City(self):
-        """test if dictionary works"""
+        """to test if dictionary works"""
         self.assertEqual('to_dict' in dir(self.city), True)
 
 
