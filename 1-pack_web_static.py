@@ -1,18 +1,26 @@
 #!/usr/bin/python3
-""" Function that compress a folder """
-from datetime import datetime
 from fabric.api import local
-import os
-
+from datetime import datetime
 
 def do_pack():
+    """
+    Generates a .tgz archive from the contents of the web_static folder.
+
+    Returns:
+        Archive path if the archive is generated, otherwise None.
+    """
     try:
-        if not os.path.exists("versions"):
-            local('mkdir versions')
-        t = datetime.now()
-        f = "%Y%m%d%H%M%S"
-        archive_path = 'versions/web_static_{}.tgz'.format(t.strftime(f))
-        local('tar -cvzf {} web_static'.format(archive_path))
-        return archive_path
-    except:
+        # Create the "versions" directory if it doesn't exist
+        local("mkdir -p versions")
+
+        # Generate archive filename (web_static_<year><month><day><hour><minute><second>.tgz)
+        now = datetime.now()
+        archive_name = "web_static_{}.tgz".format(now.strftime("%Y%m%d%H%M%S"))
+
+        # Compress the web_static folder and save it in the versions directory
+        local("tar -cvzf versions/{} web_static".format(archive_name))
+
+        # Return the path to the generated archive
+        return "versions/{}".format(archive_name)
+    except Exception:
         return None
