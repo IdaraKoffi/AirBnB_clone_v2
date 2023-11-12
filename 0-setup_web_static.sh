@@ -34,7 +34,7 @@ location /hbnb_static {
 }
 "
 # Use double quotes and escape $ and \ to prevent variable interpolation
-sudo sed -i -e "/server_name _;/a $config_text" /etc/nginx/sites-available/default
+sudo sed -i -e "/ubuntu@54.234.38.134 _;/a $config_text" /etc/nginx/sites-available/default
 
 # Restart Nginx
 sudo service nginx restart
