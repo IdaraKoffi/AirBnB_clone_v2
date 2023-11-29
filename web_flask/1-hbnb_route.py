@@ -11,5 +11,13 @@ def hello_hbnb():
     """ Function called with / route """
     return 'Hello HBNB!'
 
+
+@app.route('/hbnb', strict_slashes=False)
+def hbnb():
+    """ Function called with /hbnb route """
+    return 'HBNB'
+
 if __name__ == "__main__":
+    #starts the flask development server
+    #listens on all available network interfaces (0.0.0.0) and port 5000
     app.run(host='0.0.0.0', port=5000)
